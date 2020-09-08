@@ -35,7 +35,8 @@ class KoalasGeoAccessor:
     >> from sparcgis.koalas import KoalasGeoAccessor
     >> kdf['x'] = longitude_data
     >> kdf['y'] = latitudate_data
-    >> kdf.spatial.sr(3857).geometry(Point).to_featurelayer(title='my_agol_layer', gis=gis)
+    >> kdf.spatial.sr(3857).geometry(Point).to_featurelayer(title='my_agol_layer', gis=gis) # not yet implemented
+    >> fset_dict = kdf.spatial.sr(4326).geometry(Point).to_dict()
     """
 
     # key differences between KoalasGeoAccessor and GeoAccessor:
@@ -85,9 +86,9 @@ class KoalasGeoAccessor:
 
         typemap = {
             "esriGeometryPoint": _create_point_feature,
-            "esriGeometryPolyline": _create_polyline_feature,
-            "esriGeometryPolygon": _create_polygon_feature,
-            "esriGeometryMultipoint": _create_multipoint_feature,
+            "esriGeometryPolyline": _create_polyline_feature, # TODO
+            "esriGeometryPolygon": _create_polygon_feature, # TODO
+            "esriGeometryMultipoint": _create_multipoint_feature, # TODO
         }
         # TODO: list(map(lambda row: _create_feature(columns, row), list(df.columns)))
 
