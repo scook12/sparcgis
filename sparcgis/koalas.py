@@ -39,10 +39,14 @@ class KoalasGeoAccessor:
     >> fset_dict = kdf.spatial.sr(4326).geometry(Point).to_dict()
     """
 
-    # key differences between KoalasGeoAccessor and GeoAccessor:
+    # key differences between KoalasGeoAccessor and arcgis.features.GeoAccessor:
     # 1) specifying instead of discovering geometry types and metadata
     # 2) DF-level metadata storage (i.e. there's now row-level insertion of esri geometry/metadata)
-    # 3)
+    # 3) no nested datatypes - not supported by Koalas yet, meaning it loses convenient SHAPE column behavior
+    # #3 explains why the first two differences exist - with the pandas GeoAccessor, we can have a geometry
+    # column that nests the information we need about a feature into a single dictionary, making geometry and metadata 
+    # discovery a simple task, but without it, every column has the potential to hold relevant geographic information
+    # and in a much less structured format
 
     def __init__(self, obj):
         self.obj = obj
@@ -73,7 +77,6 @@ class KoalasGeoAccessor:
             "globalIdFieldName": "",
             "displayFieldName": "",
             "geometryType": self.geom_type,
-            "spatialReference": self.spatial_reference,
             "fields": [],
             "features": [],
         }
@@ -90,9 +93,9 @@ class KoalasGeoAccessor:
             "esriGeometryPolygon": _create_polygon_feature, # TODO
             "esriGeometryMultipoint": _create_multipoint_feature, # TODO
         }
-        # TODO: list(map(lambda row: _create_feature(columns, row), list(df.columns)))
 
-        fset["features"] = [ typemap[self.geom_type](r) for r in self.obj.to_dict('records') ]
+        fset["features"] = [ typemap[self.geom_type](r, sr=self.spatial_reference) 
+                                for r in self.obj.to_dict('records') ]
         return fset
 
     def sr(self, sr=None):
@@ -230,19 +233,21 @@ def _create_field(df, col):
         raise TypeError(f"Unsupported column type: {type(val)}")
 
 # TODO: _create_feature implementations
-def _create_point_feature(record, x_col='x', y_col='y', geom_key=None, exclude = []):
+def _create_point_feature(record, sr, x_col='x', y_col='y', geom_key=None, exclude = []):
     """
     Create an esri point feature object from a record
     """
     feature = {}
     if geom_key is not None:
-        feature['geometry'] = { 'x': record[geom_key][x_col], 'y': record[geom_key][y_col] }
+        feature['SHAPE'] = { 'x': record[geom_key][x_col], 
+                                'y': record[geom_key][y_col],
+                                'spatialReference': sr }
         feature['attributes'] = { k:v for k, v in record.items() if k != geom_key and k != 'SHAPE'\
-                                and k not in feature['geometry'].keys() and k not in exclude }
+                                and k not in feature['SHAPE'].keys() and k not in exclude }
     else:
-        feature['geometry'] = {'x': record[x_col], 'y': record[y_col]}
+        feature['SHAPE'] = {'x': record[x_col], 'y': record[y_col], 'spatialReference': sr}
         feature['attributes'] = { k:v for k,v in record.items() if k != 'SHAPE' and \
-                                k not in feature['geometry'].keys() and k not in exclude }
+                                k not in feature['SHAPE'].keys() and k not in exclude }
     return feature
 
 def _create_multipoint_feature(record):

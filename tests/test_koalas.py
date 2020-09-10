@@ -164,18 +164,22 @@ def test_fields():
 
 
 def test_to_dict():
+    # TODO: refactor - this test covers most of the _create_point_feature logic
+    # a separate set of tests should cover the feature creation
     from sparcgis.koalas import KoalasGeoAccessor
 
     kdf = dataframe()
 
     d = kdf.spatial.geometry(Point).to_dict()
-    assert d is not None
     assert isinstance(d, dict)
     assert "fields" in d
     assert d["fields"] is not None
     assert "features" in d
-    # assert d["features"] is not None
-    assert "wkid" in d["spatialReference"]
+    assert d["features"] is not None
+    assert "SHAPE" in d["features"][0]
+    pt = Point(d["features"][0]["SHAPE"])
+    assert isinstance(pt, Point)
+    assert pt.is_valid()
 
 
 def test_to_featureset():
