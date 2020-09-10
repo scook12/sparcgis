@@ -158,10 +158,7 @@ class KoalasGeoAccessor:
         return self.__feature_set__()
 
     def to_featureset(self):
-        raise NotImplementedError
-        # In order to get FeatureSet.from_dict() to work on our dict representation,
-        # fset["features"] cannot be None - need to implement _create_feature
-        # return FeatureSet.from_dict(self.__feature_set__())
+        return FeatureSet.from_dict(self.__feature_set__())
 
 
 def _get_geometry_type(t):

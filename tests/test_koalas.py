@@ -166,6 +166,7 @@ def test_fields():
 def test_to_dict():
     # TODO: refactor - this test covers most of the _create_point_feature logic
     # a separate set of tests should cover the feature creation
+    # TODO: equivalency check for FeatureSet.to_dict and kdf.spatial.to_dict
     from sparcgis.koalas import KoalasGeoAccessor
 
     kdf = dataframe()
@@ -183,23 +184,20 @@ def test_to_dict():
 
 
 def test_to_featureset():
+    # TODO: validity check for feature geometry
     from sparcgis.koalas import KoalasGeoAccessor
 
     kdf = dataframe()
-    # fset = kdf.spatial.sr().geometry(Point).to_featureset()
-    assert pytest.raises(NotImplementedError, kdf.spatial.geometry(Point).to_featureset)
-    # assert fset is not None
-    # assert isinstance(fset, FeatureSet)
-    # assert hasattr(fset, "features")
-    # assert hasattr(fset, "fields")
-    # assert hasattr(fset, "spatial_reference")
-    # fset = fset.to_dict()
-    # assert fset["fields"] is not None
-    # assert all(list(map(lambda x: validate_field(x), fset["fields"])))
-
-    # assert fset["features"] is not None
-    # assert fset["spatialReference"] is not None
-    # assert "wkid" in fset["spatialReference"]
+    kdf.spatial.sr().geometry(Point)
+    fset = kdf.spatial.to_featureset()
+    assert fset is not None
+    assert isinstance(fset, FeatureSet)
+    assert hasattr(fset, "features")
+    assert hasattr(fset, "fields")
+    assert hasattr(fset, "spatial_reference")
+    assert fset.features is not None
+    assert fset.fields is not None
+    assert fset.geometry_type is not None
 
 
 def test_to_featurelayer():
