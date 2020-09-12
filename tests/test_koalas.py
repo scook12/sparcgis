@@ -68,7 +68,7 @@ def comprehensive_dataframe():
         )
         for _ in range(5)
     ]
-    
+
     kdf = ks.DataFrame(
         {
             "npint8": list(np.random.randint(-100, 100, 5, "int8")),
@@ -117,7 +117,7 @@ def test_sr():
 
 def test_fields():
     from sparcgis.koalas import KoalasGeoAccessor
-    
+
     kdf = comprehensive_dataframe()
 
     def validate_field(field):
@@ -157,7 +157,7 @@ def test_fields():
         np.int64,
     )
 
-    fields = [ sparcgis.koalas._create_field(kdf, col) for col in list(kdf.columns)]
+    fields = [sparcgis.koalas._create_field(kdf, col) for col in list(kdf.columns)]
 
     assert fields is not None
     assert all(list(map(lambda x: validate_field(x), fields)))
