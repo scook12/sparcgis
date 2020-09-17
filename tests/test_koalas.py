@@ -41,8 +41,8 @@ import pandas as pd
 
 import sparcgis
 
-
-def dataframe():
+@pytest.fixture(scope='module')
+def kdf():
     """
     Returns a dataframe with a few values for generic testing
     """
@@ -54,8 +54,8 @@ def dataframe():
         }
     )
 
-
-def comprehensive_dataframe():
+@pytest.fixture
+def comprehensive_kdf():
     """
     Returns a koalas dataframe with all the types supported 
     Used for testing functionality where datatypes introduce cyclic complexity
@@ -98,27 +98,25 @@ def test_it_works():
     assert sparcgis.__version__ == "0.1.0"
 
 
-def test_geoaccessor():
+def test_geoaccessor(kdf):
     from sparcgis.koalas import KoalasGeoAccessor
 
-    kdf = dataframe()
     assert isinstance(kdf.spatial, KoalasGeoAccessor)
 
 
-def test_sr():
+def test_sr(kdf):
     from sparcgis.koalas import KoalasGeoAccessor
 
-    kdf = dataframe()
     kdf.spatial.sr()
     assert kdf.spatial.spatial_reference is not None
     assert isinstance(kdf.spatial.spatial_reference, SpatialReference)
     assert kdf.spatial.spatial_reference["wkid"] == 4326
 
 
-def test_fields():
+def test_fields(comprehensive_kdf):
     from sparcgis.koalas import KoalasGeoAccessor
 
-    kdf = comprehensive_dataframe()
+    kdf = comprehensive_kdf
 
     def validate_field(field):
         # internal utility to validate a given field
@@ -163,13 +161,11 @@ def test_fields():
     assert all(list(map(lambda x: validate_field(x), fields)))
 
 
-def test_to_dict():
+def test_to_dict(kdf):
     # TODO: refactor - this test covers most of the _create_point_feature logic
     # a separate set of tests should cover the feature creation
     # TODO: equivalency check for FeatureSet.to_dict and kdf.spatial.to_dict
     from sparcgis.koalas import KoalasGeoAccessor
-
-    kdf = dataframe()
 
     d = kdf.spatial.geometry(Point).to_dict()
     assert isinstance(d, dict)
@@ -183,11 +179,10 @@ def test_to_dict():
     assert pt.is_valid()
 
 
-def test_to_featureset():
+def test_to_featureset(kdf):
     # TODO: validity check for feature geometry
     from sparcgis.koalas import KoalasGeoAccessor
 
-    kdf = dataframe()
     kdf.spatial.sr().geometry(Point)
     fset = kdf.spatial.to_featureset()
     assert fset is not None
