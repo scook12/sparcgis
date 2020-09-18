@@ -58,7 +58,7 @@ def kdf():
 def comprehensive_kdf():
     """
     Returns a koalas dataframe with all the types supported 
-    Used for testing functionality where datatypes introduce cyclic complexity
+    Used for testing functionality where datatypes introduce cyclomatic complexity
     """
     from random import randrange as rr
 
@@ -119,7 +119,7 @@ def test_fields(comprehensive_kdf):
     kdf = comprehensive_kdf
 
     def validate_field(field):
-        # internal utility to validate a given field
+        # validates each field with 3 checks:
         return {
             # every field should have at least these keys: name, alias, type
             "key_check": list(field.keys()) >= ["name", "alias", "type"],

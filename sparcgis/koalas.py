@@ -249,9 +249,7 @@ def _create_point_feature(record, sr, x_col="x", y_col="y", geom_key=None, exclu
         feature["attributes"] = {
             k: v
             for k, v in record.items()
-            if k != geom_key
-            and k != "SHAPE"
-            and k not in feature["SHAPE"].keys()
+            if k not in feature["SHAPE"].keys()
             and k not in exclude
         }
     else:
@@ -263,7 +261,7 @@ def _create_point_feature(record, sr, x_col="x", y_col="y", geom_key=None, exclu
         feature["attributes"] = {
             k: v
             for k, v in record.items()
-            if k != "SHAPE" and k not in feature["SHAPE"].keys() and k not in exclude
+            if k not in feature["SHAPE"].keys() and k not in exclude
         }
     return feature
 
