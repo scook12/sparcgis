@@ -238,7 +238,6 @@ def _create_point_feature(record, sr, x_col="x", y_col="y", geom_key=None, exclu
     """
     Create an esri point feature object from a record
     """
-    # TODO: remove geometry key/SHAPE exclusions
     feature = {}
     if geom_key is not None:
         feature["SHAPE"] = {
