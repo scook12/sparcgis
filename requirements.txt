@@ -1,6 +1,6 @@
 numpy>=1.16.1
 pandas>=0.24.2
-koalas>=1.1.0
+koalas>=0.4.1
 arcgis>=1.8.0
 pytest>=5.3.0
 # databricks==0.2
