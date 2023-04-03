@@ -1,3 +1,5 @@
+Archiving this since Koalas moved to a Spark API.
+
 # sparcgis
 Use Koalas dataframes for your distributed geospatial datasets with convenient interoperability with Esri datatypes and ArcGIS software.
 
